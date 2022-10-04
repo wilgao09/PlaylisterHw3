@@ -1,0 +1,4 @@
+db
+start_all.bat
+server/node_modules/*
+client/node_modules/*
