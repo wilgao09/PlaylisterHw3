@@ -1,6 +1,6 @@
-import { createContext, useState } from 'react'
-import jsTPS from '../common/jsTPS'
-import api from '../api'
+import { createContext, useState } from "react";
+import jsTPS from "../common/jsTPS";
+import api from "../api";
 export const GlobalStoreContext = createContext({});
 /*
     This is our global data store. Note that it uses the Flux design pattern,
@@ -18,7 +18,7 @@ export const GlobalStoreActionType = {
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
-}
+};
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
 const tps = new jsTPS();
@@ -31,7 +31,7 @@ export const useGlobalStore = () => {
         idNamePairs: [],
         currentList: null,
         newListCounter: 0,
-        listNameActive: false
+        listNameActive: false,
     });
 
     // HERE'S THE DATA STORE'S REDUCER, IT MUST
@@ -45,7 +45,7 @@ export const useGlobalStore = () => {
                     idNamePairs: payload.idNamePairs,
                     currentList: payload.playlist,
                     newListCounter: store.newListCounter,
-                    listNameActive: false
+                    listNameActive: false,
                 });
             }
             // STOP EDITING THE CURRENT LIST
@@ -54,8 +54,8 @@ export const useGlobalStore = () => {
                     idNamePairs: store.idNamePairs,
                     currentList: null,
                     newListCounter: store.newListCounter,
-                    listNameActive: false
-                })
+                    listNameActive: false,
+                });
             }
             // CREATE A NEW LIST
             case GlobalStoreActionType.CREATE_NEW_LIST: {
@@ -63,8 +63,8 @@ export const useGlobalStore = () => {
                     idNamePairs: store.idNamePairs,
                     currentList: payload,
                     newListCounter: store.newListCounter + 1,
-                    listNameActive: false
-                })
+                    listNameActive: false,
+                });
             }
             // GET ALL THE LISTS SO WE CAN PRESENT THEM
             case GlobalStoreActionType.LOAD_ID_NAME_PAIRS: {
@@ -72,7 +72,7 @@ export const useGlobalStore = () => {
                     idNamePairs: payload,
                     currentList: null,
                     newListCounter: store.newListCounter,
-                    listNameActive: false
+                    listNameActive: false,
                 });
             }
             // PREPARE TO DELETE A LIST
@@ -81,7 +81,7 @@ export const useGlobalStore = () => {
                     idNamePairs: store.idNamePairs,
                     currentList: null,
                     newListCounter: store.newListCounter,
-                    listNameActive: false
+                    listNameActive: false,
                 });
             }
             // UPDATE A LIST
@@ -90,7 +90,7 @@ export const useGlobalStore = () => {
                     idNamePairs: store.idNamePairs,
                     currentList: payload,
                     newListCounter: store.newListCounter,
-                    listNameActive: false
+                    listNameActive: false,
                 });
             }
             // START EDITING A LIST NAME
@@ -99,15 +99,15 @@ export const useGlobalStore = () => {
                     idNamePairs: store.idNamePairs,
                     currentList: payload,
                     newListCounter: store.newListCounter,
-                    listNameActive: true
+                    listNameActive: true,
                 });
             }
             default:
                 return store;
         }
-    }
+    };
     // THESE ARE THE FUNCTIONS THAT WILL UPDATE OUR STORE AND
-    // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
+    // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
@@ -119,7 +119,10 @@ export const useGlobalStore = () => {
                 let playlist = response.data.playist;
                 playlist.name = newName;
                 async function updateList(playlist) {
-                    response = await api.updatePlaylistById(playlist._id, playlist);
+                    response = await api.updatePlaylistById(
+                        playlist._id,
+                        playlist
+                    );
                     if (response.data.success) {
                         async function getListPairs(playlist) {
                             response = await api.getPlaylistPairs();
@@ -129,8 +132,8 @@ export const useGlobalStore = () => {
                                     type: GlobalStoreActionType.CHANGE_LIST_NAME,
                                     payload: {
                                         idNamePairs: pairsArray,
-                                        playlist: playlist
-                                    }
+                                        playlist: playlist,
+                                    },
                                 });
                             }
                         }
@@ -141,15 +144,35 @@ export const useGlobalStore = () => {
             }
         }
         asyncChangeListName(id);
-    }
+    };
+
+    store.createNewList = function (
+        dat = { name: `Untitled${store.newListCounter}`, songs: [] }
+    ) {
+        console.log("IN CREATE NEW LIST");
+
+        async function x() {
+            let res = await api.createPlaylist(dat);
+
+            if (res.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.CREATE_NEW_LIST,
+                    payload: dat,
+                });
+                store.history.push("/playlist/" + res._id);
+            }
+        }
+
+        x();
+    };
 
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
     store.closeCurrentList = function () {
         storeReducer({
             type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
-            payload: {}
+            payload: {},
         });
-    }
+    };
 
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = function () {
@@ -159,15 +182,14 @@ export const useGlobalStore = () => {
                 let pairsArray = response.data.idNamePairs;
                 storeReducer({
                     type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
-                    payload: pairsArray
+                    payload: pairsArray,
                 });
-            }
-            else {
+            } else {
                 console.log("API FAILED TO GET THE LIST PAIRS");
             }
         }
         asyncLoadIdNamePairs();
-    }
+    };
 
     store.setCurrentList = function (id) {
         async function asyncSetCurrentList(id) {
@@ -178,32 +200,32 @@ export const useGlobalStore = () => {
                 if (response.data.success) {
                     storeReducer({
                         type: GlobalStoreActionType.SET_CURRENT_LIST,
-                        payload: playlist
+                        payload: playlist,
                     });
                     store.history.push("/playlist/" + playlist._id);
                 }
             }
         }
         asyncSetCurrentList(id);
-    }
-    store.getPlaylistSize = function() {
+    };
+    store.getPlaylistSize = function () {
         return store.currentList.songs.length;
-    }
+    };
     store.undo = function () {
         tps.undoTransaction();
-    }
+    };
     store.redo = function () {
         tps.doTransaction();
-    }
+    };
 
     // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
     store.setlistNameActive = function () {
         storeReducer({
             type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
-            payload: null
+            payload: null,
         });
-    }
+    };
 
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
     return { store, storeReducer };
-}
+};

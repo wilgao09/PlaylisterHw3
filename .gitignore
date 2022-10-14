@@ -1,4 +1,5 @@
 db
 start_all.bat
+start_front.bat
 server/node_modules/*
 client/node_modules/*
