@@ -71,7 +71,7 @@ body {
 }
 
 #playlist-selector-heading {
-    background-color: lime;
+    background-color: var(--swatch-primary);
     font-size: 36pt;
 }
 
