@@ -1,6 +1,7 @@
-import { useContext, useState } from 'react'
-import { useHistory } from 'react-router-dom'
-import { GlobalStoreContext } from '../store'
+import { useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { GlobalStoreContext } from "../store";
+import Modal from "./Modal";
 /*
     This is a card in our list of playlists. It lets select
     a list for editing and it has controls for changing its 
@@ -10,15 +11,16 @@ import { GlobalStoreContext } from '../store'
 */
 function ListCard(props) {
     const { store } = useContext(GlobalStoreContext);
-    const [ editActive, setEditActive ] = useState(false);
-    const [ text, setText ] = useState("");
+    const [editActive, setEditActive] = useState(false);
+    const [text, setText] = useState("");
+    const [delModalUp, setDelModalUp] = useState(false);
     store.history = useHistory();
     const { idNamePair, selected } = props;
 
     function handleLoadList(event) {
         if (!event.target.disabled) {
             let _id = event.target.id;
-            if (_id.indexOf('list-card-text-') >= 0)
+            if (_id.indexOf("list-card-text-") >= 0)
                 _id = ("" + _id).substring("list-card-text-".length);
 
             // CHANGE THE CURRENT LIST
@@ -47,7 +49,7 @@ function ListCard(props) {
         }
     }
     function handleUpdateText(event) {
-        setText(event.target.value );
+        setText(event.target.value);
     }
 
     let selectClass = "unselected-list-card";
@@ -58,16 +60,18 @@ function ListCard(props) {
     if (store.isListNameEditActive) {
         cardStatus = true;
     }
-    let cardElement =
+    let cardElement = (
         <div
             id={idNamePair._id}
             key={idNamePair._id}
             onClick={handleLoadList}
-            className={'list-card ' + selectClass}>
+            className={"list-card " + selectClass}
+        >
             <span
                 id={"list-card-text-" + idNamePair._id}
                 key={"span-" + idNamePair._id}
-                className="list-card-text">
+                className="list-card-text"
+            >
                 {idNamePair.name}
             </span>
             <input
@@ -75,6 +79,10 @@ function ListCard(props) {
                 type="button"
                 id={"delete-list-" + idNamePair._id}
                 className="list-card-button"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setDelModalUp(true);
+                }}
                 value={"\u2715"}
             />
             <input
@@ -85,22 +93,43 @@ function ListCard(props) {
                 onClick={handleToggleEdit}
                 value={"\u270E"}
             />
-        </div>;
+        </div>
+    );
 
     if (editActive) {
-        cardElement =
+        cardElement = (
             <input
                 id={"list-" + idNamePair._id}
-                className='list-card'
-                type='text'
+                className="list-card"
+                type="text"
                 onKeyPress={handleKeyPress}
                 onChange={handleUpdateText}
                 defaultValue={idNamePair.name}
-            />;
+            />
+        );
     }
-    return (
-        cardElement
-    );
+    if (delModalUp) {
+        return (
+            <>
+                {cardElement}
+                <Modal
+                    title="Delete Song?"
+                    cancel={(e) => {
+                        setDelModalUp(false);
+                    }}
+                    confirm={(e) => {
+                        store.deleteList(idNamePair._id);
+                        setDelModalUp(false);
+                    }}
+                >
+                    Are you sure you want to delete the list{" "}
+                    <span>{idNamePair.name}</span>?
+                </Modal>
+            </>
+        );
+    } else {
+        return cardElement;
+    }
 }
 
 export default ListCard;

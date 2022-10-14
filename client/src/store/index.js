@@ -18,6 +18,7 @@ export const GlobalStoreActionType = {
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    DELETE_LIST: "DELETE_LIST",
 };
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -100,6 +101,14 @@ export const useGlobalStore = () => {
                     currentList: payload,
                     newListCounter: store.newListCounter,
                     listNameActive: true,
+                });
+            }
+            case GlobalStoreActionType.DELETE_LIST: {
+                return setStore({
+                    idNamePairs: payload,
+                    currentList: null,
+                    newListCounter: store.newListCounter,
+                    listNameActive: false,
                 });
             }
             default:
@@ -224,6 +233,22 @@ export const useGlobalStore = () => {
             type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
             payload: null,
         });
+    };
+
+    store.deleteList = function (id) {
+        (async function () {
+            console.log("SENT DEL REQ");
+            let res = await api.deletePlaylistById(id);
+            console.log("DEL RES RECEIVED");
+            if (res.data.success) {
+                let ndata = res.data.idNamePairs;
+                console.log(ndata);
+                storeReducer({
+                    type: GlobalStoreActionType.DELETE_LIST,
+                    payload: ndata,
+                });
+            }
+        })();
     };
 
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT

@@ -198,9 +198,8 @@ input {
     padding: 1rem;
 }
 
-.modal-header,
 .modal-footer {
-    background: var(--lightgray);
+    background-color: lightgrey;
 }
 
 .modal-header {
@@ -208,11 +207,21 @@ input {
     align-items: center;
     justify-content: space-between;
     border-bottom: dotted;
+    background-color: var(--swatch-accent);
+    color: white;
 }
 
 .modal-header,
 .modal-close {
     font-size: 1.5rem;
+}
+
+.modal-center {
+    font-size: 36pt;
+}
+
+.modal-center span {
+    font-weight: bold;
 }
 
 .modal p + p {
