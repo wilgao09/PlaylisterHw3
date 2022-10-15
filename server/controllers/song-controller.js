@@ -47,8 +47,40 @@ function editSong(req, res) {
 //     });
 // }
 
+// let fs = require("fs");
+// let debugfile = fs.openSync("../debug.json", "a+");
+// let debug = (x) => {
+//     fs.appendFileSync(debugfile, JSON.stringify(x));
+// };
+// fs.writeFileSync(fs.openSync("../debug.json", "w+"), "");
+
+function dragSong(req, res) {
+    let { id, dstart, dend } = req.params;
+
+    Playlist.findOne({ _id: id }, (err, plist) => {
+        if (err) {
+            res.status(400).json({ success: false, err: err });
+        } else {
+            let t = plist.songs.splice(dstart, 1)[0];
+
+            plist.songs.splice(dend, 0, t);
+
+            console.log(plist);
+
+            plist.save().then(() => {
+                res.status(201).json({
+                    success: true,
+                    playlist: plist,
+                    src: "DRAG_SONG",
+                });
+            });
+        }
+    });
+}
+
 module.exports = {
     addSong,
     editSong,
     // deleteSong,
+    dragSong,
 };

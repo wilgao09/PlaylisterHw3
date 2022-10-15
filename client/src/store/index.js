@@ -23,6 +23,7 @@ export const GlobalStoreActionType = {
         DELETE: "SONG_DELETE",
         EDIT: "SONG_EDIT",
         ADD: "SONG_ADD",
+        DRAG: "SONG_DRAG",
     },
 };
 
@@ -118,7 +119,8 @@ export const useGlobalStore = () => {
             }
             case GlobalStoreActionType.SONG.ADD:
             case GlobalStoreActionType.SONG.EDIT:
-            case GlobalStoreActionType.SONG.DELETE: {
+            case GlobalStoreActionType.SONG.DELETE:
+            case GlobalStoreActionType.SONG.DRAG: {
                 return setStore({
                     idNamePairs: store.idNamePairs,
                     currentList: payload,
@@ -287,6 +289,22 @@ export const useGlobalStore = () => {
             if (res.data.success) {
                 storeReducer({
                     type: GlobalStoreActionType.SONG.EDIT,
+                    payload: res.data.playlist,
+                });
+            }
+        })();
+    };
+
+    store.dragSong = function (id, start, end) {
+        if (!store.currentList) return;
+        (async function () {
+            let res = await api.dragSong(store.currentList._id, start, end);
+            console.log("res");
+            console.log(res);
+
+            if (res.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.SONG.DRAG,
                     payload: res.data.playlist,
                 });
             }

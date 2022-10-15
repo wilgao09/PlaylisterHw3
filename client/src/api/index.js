@@ -29,6 +29,10 @@ export const deletePlaylistById = (id) => api.delete(`/playlist/${id}`);
 export const createPlaylist = (dat) => api.post(`/playlist`, dat);
 
 export const addSong = (id, dat) => api.post(`/playlist/song/${id}`, dat);
+
+export const dragSong = (id, start, end) =>
+    api.put(`/playlist/song/${id}/${start}/${end}`);
+
 export const editSong = (id, ind, dat) =>
     api.put(`/playlist/song/${id}/${ind}`, dat);
 
@@ -40,6 +44,7 @@ const apis = {
     deletePlaylistById,
     addSong,
     editSong,
+    dragSong,
 };
 
 export default apis;

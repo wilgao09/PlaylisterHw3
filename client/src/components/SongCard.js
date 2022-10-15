@@ -21,6 +21,16 @@ function SongCard(props) {
             onDoubleClick={(e) => {
                 setEditModalUp(true);
             }}
+            draggable="true"
+            onDragEnd={(e) => {
+                props.dragEnder();
+            }}
+            onDragOver={(e) => {
+                props.dragUpdater(index);
+            }}
+            onDragStart={() => {
+                props.dragStarter(index);
+            }}
         >
             {index + 1}.
             <a
@@ -35,7 +45,7 @@ function SongCard(props) {
                 id={"remove-song-" + index}
                 className="list-card-button"
                 value={"\u2715"}
-                onClick={(e) => store.addSong()}
+                onClick={(e) => alert("//TODO")}
             />
         </div>
     );
