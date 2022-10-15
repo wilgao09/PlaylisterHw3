@@ -5,7 +5,7 @@ function addSong(req, res) {
         if (err) {
             res.status(400).json({ success: false, err: err });
         } else {
-            list.songs.push(req.body);
+            list.songs.splice(req.params.ind, 0, req.body);
             list.save().then(() => {
                 res.status(201).json({
                     success: true,

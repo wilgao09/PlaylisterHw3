@@ -267,22 +267,22 @@ export const useGlobalStore = () => {
         })();
     };
 
-    store.addSong = function (
-        dat = { title: "Untitled", artist: "Unknown", youTubeId: "dQw4w9WgXcQ" }
-    ) {
+    store.addSongAux = function (ind, dat, cb = () => {}) {
         if (!store.currentList) return;
         (async function () {
-            let res = await api.addSong(store.currentList._id, dat);
+            let res = await api.addSong(store.currentList._id, ind, dat);
             if (res.data.success) {
                 storeReducer({
                     type: GlobalStoreActionType.SONG.ADD,
                     payload: res.data.playlist,
                 });
+            } else {
+                cb();
             }
         })();
     };
 
-    store.editSong = function (ind, dat) {
+    store.editSongAux = function (ind, dat, cb = () => {}) {
         if (!store.currentList) return;
         (async function () {
             let res = await api.editSong(store.currentList._id, ind, dat);
@@ -291,11 +291,13 @@ export const useGlobalStore = () => {
                     type: GlobalStoreActionType.SONG.EDIT,
                     payload: res.data.playlist,
                 });
+            } else {
+                cb();
             }
         })();
     };
 
-    store.dragSong = function (id, start, end) {
+    store.dragSongAux = function (start, end, cb = () => {}) {
         if (!store.currentList) return;
         (async function () {
             let res = await api.dragSong(store.currentList._id, start, end);
@@ -305,23 +307,98 @@ export const useGlobalStore = () => {
                     type: GlobalStoreActionType.SONG.DRAG,
                     payload: res.data.playlist,
                 });
+            } else {
+                cb();
             }
         })();
     };
 
-    store.deleteSong = function (ind) {
+    // invariant: this is called only called by a doTransaction()
+    store.deleteSongAux = function (ind, cb = () => {}) {
         if (!store.currentList) return;
         (async function () {
             let res = await api.deleteSong(store.currentList._id, ind);
-            console.log("RES FOR DELETE");
-            console.log(res);
             if (res.data.success) {
                 storeReducer({
                     type: GlobalStoreActionType.SONG.DELETE,
                     payload: res.data.playlist,
                 });
+            } else {
+                cb();
             }
         })();
+    };
+
+    store.addSong = function (
+        ind = -1,
+        dat = { title: "Untitled", artist: "Unknown", youTubeId: "dQw4w9WgXcQ" }
+    ) {
+        if (ind == -1) ind = store.currentList.songs.length;
+        tps.addTransaction({
+            doTransaction: async () => {
+                store.addSongAux(ind, dat, () => {
+                    alert("Failed to do: Add Song");
+                    tps.mostRecentTransaction--;
+                });
+            },
+            undoTransaction: async () => {
+                store.deleteSongAux(ind, () => {
+                    alert("Failed to do: Undo Add Song");
+                    tps.mostRecentTransaction++;
+                });
+            },
+        });
+    };
+
+    store.editSong = function (ind, odata, ndata) {
+        tps.addTransaction({
+            doTransaction: () => {
+                store.editSongAux(ind, ndata, () => {
+                    alert("Failed to do: Edit Song");
+                    tps.mostRecentTransaction--;
+                });
+            },
+            undoTransaction: () => {
+                store.editSongAux(ind, odata, () => {
+                    alert("Failed to do: Undo Edit Song");
+                    tps.mostRecentTransaction++;
+                });
+            },
+        });
+    };
+
+    store.dragSong = function (start, end) {
+        tps.addTransaction({
+            doTransaction: () => {
+                store.dragSongAux(start, end, () => {
+                    alert("Failed to do: Drag Song");
+                    tps.mostRecentTransaction--;
+                });
+            },
+            undoTransaction: () => {
+                store.dragSongAux(end, start, () => {
+                    alert("Failed to do: Undo Drag Song");
+                    tps.mostRecentTransaction++;
+                });
+            },
+        });
+    };
+
+    store.deleteSong = function (ind, dat) {
+        tps.addTransaction({
+            doTransaction: async () => {
+                store.deleteSongAux(ind, () => {
+                    alert("Failed to do: Delete Song");
+                    tps.mostRecentTransaction--;
+                });
+            },
+            undoTransaction: async () => {
+                store.addSongAux(ind, dat, () => {
+                    alert("Failed to do: Undo Delete Song");
+                    tps.mostRecentTransaction++;
+                });
+            },
+        });
     };
 
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT

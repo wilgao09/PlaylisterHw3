@@ -59,11 +59,19 @@ function SongCard(props) {
                 <Modal
                     title="Edit Song"
                     confirm={() => {
-                        store.editSong(index, {
-                            title: titleIn,
-                            artist: artistIn,
-                            youTubeId: ytIdIn,
-                        });
+                        store.editSong(
+                            index,
+                            {
+                                title: song.title,
+                                artist: song.artist,
+                                youTubeId: song.youTubeId,
+                            },
+                            {
+                                title: titleIn ? titleIn : "Untitled",
+                                artist: artistIn ? artistIn : "Unknown",
+                                youTubeId: ytIdIn ? ytIdIn : "dQw4w9WgXcQ",
+                            }
+                        );
 
                         setEditModalUp(false);
                     }}
@@ -107,7 +115,11 @@ function SongCard(props) {
                 <Modal
                     title="Delete Song"
                     confirm={() => {
-                        store.deleteSong(index);
+                        store.deleteSong(index, {
+                            title: song.title,
+                            artist: song.artist,
+                            youTubeId: song.youTubeId,
+                        });
                         setDelModalUp(false);
                     }}
                     cancel={() => {

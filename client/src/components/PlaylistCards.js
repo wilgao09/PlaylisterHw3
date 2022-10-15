@@ -21,10 +21,7 @@ function PlaylistCards() {
             setDragStart(-1);
             return;
         }
-        console.log(`card dragged from ${dragStart} and ended at ${dropInd}`);
-        console.log(store);
-        console.log("^^ store here? ^^");
-        store.dragSong(store.currentList._id, dragStart, dropInd);
+        store.dragSong(dragStart, dropInd);
     };
 
     return (
