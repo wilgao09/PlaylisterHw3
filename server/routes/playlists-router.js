@@ -6,6 +6,7 @@
 */
 const express = require("express");
 const PlaylistController = require("../controllers/playlist-controller");
+const SongController = require("../controllers/song-controller");
 const router = express.Router();
 
 router.post("/playlist", PlaylistController.createPlaylist);
@@ -14,5 +15,9 @@ router.get("/playlists", PlaylistController.getPlaylists);
 router.get("/playlistpairs", PlaylistController.getPlaylistPairs);
 
 router.delete("/playlist/:id", PlaylistController.deletePlaylistById);
+
+router.post("/playlist/song/:id", SongController.addSong);
+// router.put("/playlist/song/:id/:ind", SongController.updateSong);
+// router.delete("/playlist/song/:id/:ind", SongController.deleteSong);
 
 module.exports = router;
