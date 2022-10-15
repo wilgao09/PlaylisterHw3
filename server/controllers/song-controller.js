@@ -32,20 +32,21 @@ function editSong(req, res) {
     });
 }
 
-// function deleteSong(req, res) {
-//     Playlist.deleteOne({ _id: req.params.id }, (err, list) => {
-//         if (err) {
-//             res.status(400).json({ success: false, err: err });
-//         } else {
-//             list.save().then(() => {
-//                 res.status(200).json({
-//                     success: true,
-//                     playlist: list,
-//                 });
-//             });
-//         }
-//     });
-// }
+function deleteSong(req, res) {
+    Playlist.findOne({ _id: req.params.id }, (err, list) => {
+        if (err) {
+            res.status(400).json({ success: false, err: err });
+        } else {
+            list.songs.splice(req.params.ind, 1);
+            list.save().then(() => {
+                res.status(200).json({
+                    success: true,
+                    playlist: list,
+                });
+            });
+        }
+    });
+}
 
 // let fs = require("fs");
 // let debugfile = fs.openSync("../debug.json", "a+");
@@ -81,6 +82,6 @@ function dragSong(req, res) {
 module.exports = {
     addSong,
     editSong,
-    // deleteSong,
+    deleteSong,
     dragSong,
 };

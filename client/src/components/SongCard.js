@@ -6,6 +6,7 @@ import Modal from "./Modal";
 function SongCard(props) {
     const { store } = useContext(GlobalStoreContext);
     const [editModalUp, setEditModalUp] = useState(false);
+    const [delModalUp, setDelModalUp] = useState(false);
 
     const { song, index } = props;
     const [titleIn, setTitleIn] = useState(song.title);
@@ -45,7 +46,7 @@ function SongCard(props) {
                 id={"remove-song-" + index}
                 className="list-card-button"
                 value={"\u2715"}
-                onClick={(e) => alert("//TODO")}
+                onClick={(e) => setDelModalUp(true)}
             />
         </div>
     );
@@ -96,6 +97,25 @@ function SongCard(props) {
                             style={{ gridRow: "3/4", gridColumn: "2/3" }}
                         />
                     </div>
+                </Modal>
+            </>
+        );
+    } else if (delModalUp) {
+        return (
+            <>
+                {card}
+                <Modal
+                    title="Delete Song"
+                    confirm={() => {
+                        store.deleteSong(index);
+                        setDelModalUp(false);
+                    }}
+                    cancel={() => {
+                        setDelModalUp(false);
+                    }}
+                >
+                    Are you sure you want to permanently delete{" "}
+                    <span>{song.title}</span>?
                 </Modal>
             </>
         );

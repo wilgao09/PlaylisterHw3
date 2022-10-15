@@ -299,12 +299,25 @@ export const useGlobalStore = () => {
         if (!store.currentList) return;
         (async function () {
             let res = await api.dragSong(store.currentList._id, start, end);
-            console.log("res");
-            console.log(res);
 
             if (res.data.success) {
                 storeReducer({
                     type: GlobalStoreActionType.SONG.DRAG,
+                    payload: res.data.playlist,
+                });
+            }
+        })();
+    };
+
+    store.deleteSong = function (ind) {
+        if (!store.currentList) return;
+        (async function () {
+            let res = await api.deleteSong(store.currentList._id, ind);
+            console.log("RES FOR DELETE");
+            console.log(res);
+            if (res.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.SONG.DELETE,
                     payload: res.data.playlist,
                 });
             }
