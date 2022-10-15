@@ -280,6 +280,19 @@ export const useGlobalStore = () => {
         })();
     };
 
+    store.editSong = function (ind, dat) {
+        if (!store.currentList) return;
+        (async function () {
+            let res = await api.editSong(store.currentList._id, ind, dat);
+            if (res.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.SONG.EDIT,
+                    payload: res.data.playlist,
+                });
+            }
+        })();
+    };
+
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
     return { store, storeReducer };
 };

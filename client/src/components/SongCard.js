@@ -1,13 +1,27 @@
 import React, { useContext, useState } from "react";
 import { GlobalStoreContext } from "../store";
 
+import Modal from "./Modal";
+
 function SongCard(props) {
     const { store } = useContext(GlobalStoreContext);
+    const [editModalUp, setEditModalUp] = useState(false);
 
     const { song, index } = props;
+    const [titleIn, setTitleIn] = useState(song.title);
+    const [artistIn, setArtistIn] = useState(song.artist);
+    const [ytIdIn, setYtIdIn] = useState(song.youTubeId);
+
     let cardClass = "list-card unselected-list-card";
-    return (
-        <div key={index} id={"song-" + index + "-card"} className={cardClass}>
+    let card = (
+        <div
+            key={index}
+            id={"song-" + index + "-card"}
+            className={cardClass}
+            onDoubleClick={(e) => {
+                setEditModalUp(true);
+            }}
+        >
             {index + 1}.
             <a
                 id={"song-" + index + "-link"}
@@ -25,6 +39,59 @@ function SongCard(props) {
             />
         </div>
     );
+
+    if (editModalUp) {
+        return (
+            <>
+                {card}
+
+                <Modal
+                    title="Edit Song"
+                    confirm={() => {
+                        store.editSong(index, {
+                            title: titleIn,
+                            artist: artistIn,
+                            youTubeId: ytIdIn,
+                        });
+
+                        setEditModalUp(false);
+                    }}
+                    cancel={() => {
+                        setEditModalUp(false);
+                    }}
+                >
+                    <div className="edit-modal-grid">
+                        <text style={{ gridRow: "1/2", gridColumn: "1/2" }}>
+                            Title:
+                        </text>
+                        <input
+                            type="text"
+                            onChange={(e) => setTitleIn(e.target.value)}
+                            style={{ gridRow: "1/2", gridColumn: "2/3" }}
+                        />
+                        <text style={{ gridRow: "2/3", gridColumn: "1/2" }}>
+                            Artist:
+                        </text>
+                        <input
+                            type="text"
+                            onChange={(e) => setArtistIn(e.target.value)}
+                            style={{ gridRow: "2/3", gridColumn: "2/3" }}
+                        />
+                        <text style={{ gridRow: "3/4", gridColumn: "1/2" }}>
+                            You Tube Id:
+                        </text>
+                        <input
+                            type="text"
+                            onChange={(e) => setYtIdIn(e.target.value)}
+                            style={{ gridRow: "3/4", gridColumn: "2/3" }}
+                        />
+                    </div>
+                </Modal>
+            </>
+        );
+    } else {
+        return <>{card}</>;
+    }
 }
 
 export default SongCard;

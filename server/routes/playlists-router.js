@@ -17,7 +17,7 @@ router.get("/playlistpairs", PlaylistController.getPlaylistPairs);
 router.delete("/playlist/:id", PlaylistController.deletePlaylistById);
 
 router.post("/playlist/song/:id", SongController.addSong);
-// router.put("/playlist/song/:id/:ind", SongController.updateSong);
+router.put("/playlist/song/:id/:ind", SongController.editSong);
 // router.delete("/playlist/song/:id/:ind", SongController.deleteSong);
 
 module.exports = router;
