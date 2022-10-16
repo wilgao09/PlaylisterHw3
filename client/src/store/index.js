@@ -25,6 +25,8 @@ export const GlobalStoreActionType = {
         ADD: "SONG_ADD",
         DRAG: "SONG_DRAG",
     },
+    MODAL_UP: "MODAL_UP",
+    MODAL_DOWN: "MODAL_DOWN",
 };
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -39,6 +41,7 @@ export const useGlobalStore = () => {
         currentList: null,
         newListCounter: 0,
         listNameActive: false,
+        activeButtons: [true, false, false, false, false],
     });
 
     // HERE'S THE DATA STORE'S REDUCER, IT MUST
@@ -53,6 +56,7 @@ export const useGlobalStore = () => {
                     currentList: payload.playlist,
                     newListCounter: store.newListCounter,
                     listNameActive: false,
+                    activeButtons: [true, false, false, false, false],
                 });
             }
             // STOP EDITING THE CURRENT LIST
@@ -62,6 +66,7 @@ export const useGlobalStore = () => {
                     currentList: null,
                     newListCounter: store.newListCounter,
                     listNameActive: false,
+                    activeButtons: [true, false, false, false, false],
                 });
             }
             // CREATE A NEW LIST
@@ -71,6 +76,7 @@ export const useGlobalStore = () => {
                     currentList: payload,
                     newListCounter: store.newListCounter + 1,
                     listNameActive: false,
+                    activeButtons: store.activeButtons,
                 });
             }
             // GET ALL THE LISTS SO WE CAN PRESENT THEM
@@ -80,6 +86,7 @@ export const useGlobalStore = () => {
                     currentList: null,
                     newListCounter: store.newListCounter,
                     listNameActive: false,
+                    activeButtons: [true, false, false, false, false],
                 });
             }
             // PREPARE TO DELETE A LIST
@@ -89,6 +96,7 @@ export const useGlobalStore = () => {
                     currentList: null,
                     newListCounter: store.newListCounter,
                     listNameActive: false,
+                    activeButtons: store.activeButtons, //TODO:
                 });
             }
             // UPDATE A LIST
@@ -98,6 +106,7 @@ export const useGlobalStore = () => {
                     currentList: payload,
                     newListCounter: store.newListCounter,
                     listNameActive: false,
+                    activeButtons: [false, true, false, false, true],
                 });
             }
             // START EDITING A LIST NAME
@@ -107,6 +116,7 @@ export const useGlobalStore = () => {
                     currentList: payload,
                     newListCounter: store.newListCounter,
                     listNameActive: true,
+                    activeButtons: [false, false, false, false, false],
                 });
             }
             case GlobalStoreActionType.DELETE_LIST: {
@@ -115,6 +125,7 @@ export const useGlobalStore = () => {
                     currentList: null,
                     newListCounter: store.newListCounter,
                     listNameActive: false,
+                    activeButtons: [true, false, false, false, false],
                 });
             }
             case GlobalStoreActionType.SONG.ADD:
@@ -126,8 +137,37 @@ export const useGlobalStore = () => {
                     currentList: payload,
                     newListCounter: store.newListCounter,
                     listNameActive: store.listNameActive, //TODO: what does this do?
+                    activeButtons: [
+                        false,
+                        true,
+                        tps.hasTransactionToUndo(),
+                        tps.hasTransactionToRedo(),
+                        true,
+                    ],
                 });
             }
+            case GlobalStoreActionType.MODAL_UP:
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    listNameActive: store.listNameActive,
+                    activeButtons: [false, false, false, false, false],
+                });
+            case GlobalStoreActionType.MODAL_DOWN:
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    listNameActive: store.listNameActive,
+                    activeButtons: [
+                        false,
+                        true,
+                        tps.hasTransactionToUndo(),
+                        tps.hasTransactionToRedo(),
+                        true,
+                    ],
+                });
             default:
                 return store;
         }
@@ -175,17 +215,16 @@ export const useGlobalStore = () => {
     store.createNewList = function (
         dat = { name: `Untitled${store.newListCounter}`, songs: [] }
     ) {
-        console.log("IN CREATE NEW LIST");
-
         async function x() {
             let res = await api.createPlaylist(dat);
-
+            console.log("created list res is");
+            console.log(res);
             if (res.data.success) {
                 storeReducer({
                     type: GlobalStoreActionType.CREATE_NEW_LIST,
                     payload: dat,
                 });
-                store.history.push("/playlist/" + res._id);
+                store.history.push("/playlist/" + res.data.playlist._id);
             }
         }
 
@@ -222,8 +261,6 @@ export const useGlobalStore = () => {
             let response = await api.getPlaylistById(id);
             if (response.data.success) {
                 let playlist = response.data.playlist;
-                console.log("NEW PAYLIST IS");
-                console.log(playlist);
                 if (response.data.success) {
                     storeReducer({
                         type: GlobalStoreActionType.SET_CURRENT_LIST,
@@ -400,6 +437,22 @@ export const useGlobalStore = () => {
             },
         });
     };
+
+    store.disableAll = function () {
+        storeReducer({
+            type: GlobalStoreActionType.MODAL_UP,
+            payload: null,
+        });
+    };
+    store.reenable = function () {
+        storeReducer({
+            type: GlobalStoreActionType.MODAL_DOWN,
+            payload: null,
+        });
+    };
+
+    store.hasUndo = () => tps.hasTransactionToUndo();
+    store.hadRedo = () => tps.hasTransactionToRedo();
 
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
     return { store, storeReducer };

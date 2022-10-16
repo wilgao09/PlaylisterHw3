@@ -34,7 +34,12 @@ const ListSelector = () => {
                             type="button"
                             id="add-list-button"
                             onClick={handleCreateNewList}
-                            className="playlister-button"
+                            className={
+                                store.activeButtons[0]
+                                    ? "playlister-button"
+                                    : "playlister-button-disabled"
+                            }
+                            disabled={!store.activeButtons[0]}
                             value="+"
                         />
                         Your Lists

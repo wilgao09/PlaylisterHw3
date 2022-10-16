@@ -21,6 +21,7 @@ function SongCard(props) {
             className={cardClass}
             onDoubleClick={(e) => {
                 setEditModalUp(true);
+                store.disableAll();
             }}
             draggable="true"
             onDragEnd={(e) => {
@@ -46,11 +47,13 @@ function SongCard(props) {
                 id={"remove-song-" + index}
                 className="list-card-button"
                 value={"\u2715"}
-                onClick={(e) => setDelModalUp(true)}
+                onClick={(e) => {
+                    setDelModalUp(true);
+                    store.disableAll();
+                }}
             />
         </div>
     );
-
     if (editModalUp) {
         return (
             <>
@@ -72,10 +75,10 @@ function SongCard(props) {
                                 youTubeId: ytIdIn ? ytIdIn : "dQw4w9WgXcQ",
                             }
                         );
-
                         setEditModalUp(false);
                     }}
                     cancel={() => {
+                        store.reenable();
                         setEditModalUp(false);
                     }}
                 >
@@ -123,6 +126,7 @@ function SongCard(props) {
                         setDelModalUp(false);
                     }}
                     cancel={() => {
+                        store.reenable();
                         setDelModalUp(false);
                     }}
                 >
