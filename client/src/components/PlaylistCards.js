@@ -25,9 +25,9 @@ function PlaylistCards() {
     };
     const { id } = useParams();
     if (store.currentList == null) {
-        // store.setCurrentList(id);
+        store.setCurrentList(id);
         // alert("maybe " + window.location.pathname.split("/")[2]);
-        store.setCurrentList(window.location.pathname.split("/")[2]);
+        // store.setCurrentList(window.location.pathname.split("/")[2]);
         return (
             <div style={{ fontSize: "40pt", color: "red" }}>
                 <p> 404 RESOURCE NOT FOUND </p>
@@ -36,7 +36,17 @@ function PlaylistCards() {
         );
     } else {
         return (
-            <div id="playlist-cards">
+            <div
+                id="playlist-cards"
+                tabIndex={-1}
+                onKeyDown={(e) => {
+                    console.log("pressed");
+                    if (store.activeButtons[1] && e.ctrlKey) {
+                        if (e.code == "KeyY") store.redo();
+                        if (e.code == "KeyZ") store.undo();
+                    }
+                }}
+            >
                 {store.currentList.songs.map((song, index) => (
                     <SongCard
                         id={"playlist-song-" + index}

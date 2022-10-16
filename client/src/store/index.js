@@ -76,7 +76,7 @@ export const useGlobalStore = () => {
                     currentList: payload,
                     newListCounter: store.newListCounter + 1,
                     listNameActive: false,
-                    activeButtons: store.activeButtons,
+                    activeButtons: [false, true, false, false, true],
                 });
             }
             // GET ALL THE LISTS SO WE CAN PRESENT THEM
@@ -203,6 +203,7 @@ export const useGlobalStore = () => {
                     type: GlobalStoreActionType.CREATE_NEW_LIST,
                     payload: dat,
                 });
+
                 store.history.push("/playlist/" + res.data.playlist._id);
             }
         }
@@ -238,8 +239,10 @@ export const useGlobalStore = () => {
     store.setCurrentList = function (id) {
         async function asyncSetCurrentList(id) {
             let response = await api.getPlaylistById(id);
+
             if (response.data.success) {
                 let playlist = response.data.playlist;
+
                 if (response.data.success) {
                     storeReducer({
                         type: GlobalStoreActionType.SET_CURRENT_LIST,
