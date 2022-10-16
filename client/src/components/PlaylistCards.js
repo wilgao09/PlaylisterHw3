@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import SongCard from "./SongCard.js";
 import { GlobalStoreContext } from "../store";
 /*
@@ -23,22 +23,34 @@ function PlaylistCards() {
         }
         store.dragSong(dragStart, dropInd);
     };
-
-    return (
-        <div id="playlist-cards">
-            {store.currentList.songs.map((song, index) => (
-                <SongCard
-                    id={"playlist-song-" + index}
-                    key={"playlist-song-" + index}
-                    index={index}
-                    song={song}
-                    dragStarter={setDragStart}
-                    dragEnder={dropCardHandler}
-                    dragUpdater={setDropInd}
-                />
-            ))}
-        </div>
-    );
+    const { id } = useParams();
+    if (store.currentList == null) {
+        // store.setCurrentList(id);
+        // alert("maybe " + window.location.pathname.split("/")[2]);
+        store.setCurrentList(window.location.pathname.split("/")[2]);
+        return (
+            <div style={{ fontSize: "40pt", color: "red" }}>
+                <p> 404 RESOURCE NOT FOUND </p>
+                <p>Failed to find playlist with id {id}</p>
+            </div>
+        );
+    } else {
+        return (
+            <div id="playlist-cards">
+                {store.currentList.songs.map((song, index) => (
+                    <SongCard
+                        id={"playlist-song-" + index}
+                        key={"playlist-song-" + index}
+                        index={index}
+                        song={song}
+                        dragStarter={setDragStart}
+                        dragEnder={dropCardHandler}
+                        dragUpdater={setDropInd}
+                    />
+                ))}
+            </div>
+        );
+    }
 }
 
 export default PlaylistCards;

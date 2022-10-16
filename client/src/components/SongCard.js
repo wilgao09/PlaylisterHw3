@@ -92,7 +92,8 @@ function SongCard(props) {
                             onChange={(e) => setTitleIn(e.target.value)}
                             style={{ gridRow: "1/2", gridColumn: "2/3" }}
                             placeholder="Untitled"
-                            value={titleIn ? titleIn : song.title}
+                            // value={titleIn ? titleIn : song.title}
+                            defaultValue={song.title}
                         />
                         <text style={{ gridRow: "2/3", gridColumn: "1/2" }}>
                             Artist:
@@ -102,7 +103,8 @@ function SongCard(props) {
                             onChange={(e) => setArtistIn(e.target.value)}
                             style={{ gridRow: "2/3", gridColumn: "2/3" }}
                             placeholder="Unknown"
-                            value={artistIn ? artistIn : song.artist}
+                            // value={artistIn ? artistIn : song.artist}
+                            defaultValue={song.artist}
                         />
                         <text style={{ gridRow: "3/4", gridColumn: "1/2" }}>
                             You Tube Id:
@@ -112,7 +114,8 @@ function SongCard(props) {
                             onChange={(e) => setYtIdIn(e.target.value)}
                             style={{ gridRow: "3/4", gridColumn: "2/3" }}
                             placeholder="dQw4w9WgXcQ"
-                            value={ytIdIn ? ytIdIn : song.youTubeId}
+                            // value={ytIdIn ? ytIdIn : song.youTubeId}
+                            defaultValue={song.youTubeId}
                         />
                     </div>
                 </Modal>
