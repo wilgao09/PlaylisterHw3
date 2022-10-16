@@ -10,12 +10,12 @@ import Modal from "./Modal";
     @author McKilla Gorilla
 */
 function ListCard(props) {
+    const { idNamePair, selected } = props;
     const { store } = useContext(GlobalStoreContext);
     const [editActive, setEditActive] = useState(false);
-    const [text, setText] = useState("");
+    const [text, setText] = useState(idNamePair.name);
     const [delModalUp, setDelModalUp] = useState(false);
     store.history = useHistory();
-    const { idNamePair, selected } = props;
 
     function handleLoadList(event) {
         if (!event.target.disabled) {
@@ -36,7 +36,7 @@ function ListCard(props) {
     function toggleEdit() {
         let newActive = !editActive;
         if (newActive) {
-            store.setIsListNameEditActive();
+            store.setListNameEditActive();
         }
         setEditActive(newActive);
     }
@@ -48,16 +48,13 @@ function ListCard(props) {
             toggleEdit();
         }
     }
-    function handleUpdateText(event) {
-        setText(event.target.value);
-    }
 
     let selectClass = "unselected-list-card";
     if (selected) {
         selectClass = "selected-list-card";
     }
     let cardStatus = false;
-    if (store.isListNameEditActive) {
+    if (store.listNameActive || !store.activeButtons[0]) {
         cardStatus = true;
     }
     let cardElement = (
@@ -82,6 +79,7 @@ function ListCard(props) {
                 onClick={(e) => {
                     e.stopPropagation();
                     setDelModalUp(true);
+                    store.disableAll();
                 }}
                 value={"\u2715"}
             />
@@ -97,13 +95,13 @@ function ListCard(props) {
     );
 
     if (editActive) {
-        cardElement = (
+        return (
             <input
                 id={"list-" + idNamePair._id}
                 className="list-card"
                 type="text"
                 onKeyPress={handleKeyPress}
-                onChange={handleUpdateText}
+                onChange={(e) => setText(e.target.value)}
                 defaultValue={idNamePair.name}
             />
         );
@@ -116,6 +114,7 @@ function ListCard(props) {
                     title="Delete Song?"
                     cancel={(e) => {
                         setDelModalUp(false);
+                        store.reenable(true);
                     }}
                     confirm={(e) => {
                         store.deleteList(idNamePair._id);

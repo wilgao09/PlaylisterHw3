@@ -95,9 +95,21 @@ getPlaylistPairs = async (req, res) => {
     }).catch((err) => console.log(err));
 };
 
-deletePlaylistById = async (req, res) => {
-    await Playlist.deleteOne({ _id: req.params.id }, (err) => {
+deletePlaylistById = (req, res) => {
+    Playlist.deleteOne({ _id: req.params.id }, (err) => {
+        if (err) res.status(400).json({ success: false, err: err });
         getPlaylistPairs(req, res);
+    });
+};
+
+updatePlaylistNameById = (req, res) => {
+    console.log("UPDATE PLN BY ID");
+    Playlist.findOne({ _id: req.params.id }, (err, doc) => {
+        if (err) res.status(400).json({ success: false, err: err });
+        doc.name = req.params.name;
+        doc.save().then(() => {
+            getPlaylistPairs(req, res);
+        });
     });
 };
 
@@ -107,4 +119,5 @@ module.exports = {
     getPlaylistPairs,
     getPlaylistById,
     deletePlaylistById,
+    updatePlaylistNameById,
 };

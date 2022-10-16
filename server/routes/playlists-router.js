@@ -16,6 +16,8 @@ router.get("/playlistpairs", PlaylistController.getPlaylistPairs);
 
 router.delete("/playlist/:id", PlaylistController.deletePlaylistById);
 
+router.put("/playlist/:id/:name", PlaylistController.updatePlaylistNameById);
+
 router.post("/playlist/song/:id/:ind", SongController.addSong);
 router.put("/playlist/song/:id/:dstart/:dend", SongController.dragSong);
 router.put("/playlist/song/:id/:ind", SongController.editSong);

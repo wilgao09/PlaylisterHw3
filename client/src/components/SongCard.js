@@ -9,9 +9,9 @@ function SongCard(props) {
     const [delModalUp, setDelModalUp] = useState(false);
 
     const { song, index } = props;
-    const [titleIn, setTitleIn] = useState(song.title);
-    const [artistIn, setArtistIn] = useState(song.artist);
-    const [ytIdIn, setYtIdIn] = useState(song.youTubeId);
+    const [titleIn, setTitleIn] = useState("");
+    const [artistIn, setArtistIn] = useState("");
+    const [ytIdIn, setYtIdIn] = useState("");
 
     let cardClass = "list-card unselected-list-card";
     let card = (
@@ -51,6 +51,7 @@ function SongCard(props) {
                     setDelModalUp(true);
                     store.disableAll();
                 }}
+                disabled={!store.activeButtons[1]}
             />
         </div>
     );
@@ -90,6 +91,8 @@ function SongCard(props) {
                             type="text"
                             onChange={(e) => setTitleIn(e.target.value)}
                             style={{ gridRow: "1/2", gridColumn: "2/3" }}
+                            placeholder="Untitled"
+                            value={titleIn ? titleIn : song.title}
                         />
                         <text style={{ gridRow: "2/3", gridColumn: "1/2" }}>
                             Artist:
@@ -98,6 +101,8 @@ function SongCard(props) {
                             type="text"
                             onChange={(e) => setArtistIn(e.target.value)}
                             style={{ gridRow: "2/3", gridColumn: "2/3" }}
+                            placeholder="Unknown"
+                            value={artistIn ? artistIn : song.artist}
                         />
                         <text style={{ gridRow: "3/4", gridColumn: "1/2" }}>
                             You Tube Id:
@@ -106,6 +111,8 @@ function SongCard(props) {
                             type="text"
                             onChange={(e) => setYtIdIn(e.target.value)}
                             style={{ gridRow: "3/4", gridColumn: "2/3" }}
+                            placeholder="dQw4w9WgXcQ"
+                            value={ytIdIn ? ytIdIn : song.youTubeId}
                         />
                     </div>
                 </Modal>
@@ -123,6 +130,7 @@ function SongCard(props) {
                             artist: song.artist,
                             youTubeId: song.youTubeId,
                         });
+
                         setDelModalUp(false);
                     }}
                     cancel={() => {

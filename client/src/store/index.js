@@ -160,13 +160,15 @@ export const useGlobalStore = () => {
                     currentList: store.currentList,
                     newListCounter: store.newListCounter,
                     listNameActive: store.listNameActive,
-                    activeButtons: [
-                        false,
-                        true,
-                        tps.hasTransactionToUndo(),
-                        tps.hasTransactionToRedo(),
-                        true,
-                    ],
+                    activeButtons: payload
+                        ? [true, false, false, false, false]
+                        : [
+                              false,
+                              true,
+                              tps.hasTransactionToUndo(),
+                              tps.hasTransactionToRedo(),
+                              true,
+                          ],
                 });
             default:
                 return store;
@@ -177,39 +179,16 @@ export const useGlobalStore = () => {
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
-    store.changeListName = function (id, newName) {
-        // GET THE LIST
-        async function asyncChangeListName(id) {
-            let response = await api.getPlaylistById(id);
-            if (response.data.success) {
-                let playlist = response.data.playlist;
-                playlist.name = newName;
-                async function updateList(playlist) {
-                    response = await api.updatePlaylistById(
-                        playlist._id,
-                        playlist
-                    );
-                    if (response.data.success) {
-                        async function getListPairs(playlist) {
-                            response = await api.getPlaylistPairs();
-                            if (response.data.success) {
-                                let pairsArray = response.data.idNamePairs;
-                                storeReducer({
-                                    type: GlobalStoreActionType.CHANGE_LIST_NAME,
-                                    payload: {
-                                        idNamePairs: pairsArray,
-                                        playlist: playlist,
-                                    },
-                                });
-                            }
-                        }
-                        getListPairs(playlist);
-                    }
-                }
-                updateList(playlist);
-            }
+    store.changeListName = async function (id, newName) {
+        let res = await api.updatePlaylistNameById(id, newName);
+        console.log("RES FROM CHANGE LSIT NAME");
+        console.log(res);
+        if (res.data.success) {
+            storeReducer({
+                type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                payload: res.data.idNamePairs,
+            });
         }
-        asyncChangeListName(id);
     };
 
     store.createNewList = function (
@@ -283,7 +262,7 @@ export const useGlobalStore = () => {
     };
 
     // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
-    store.setlistNameActive = function () {
+    store.setListNameEditActive = function () {
         storeReducer({
             type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
             payload: null,
@@ -444,10 +423,10 @@ export const useGlobalStore = () => {
             payload: null,
         });
     };
-    store.reenable = function () {
+    store.reenable = function (isFromMain = false) {
         storeReducer({
             type: GlobalStoreActionType.MODAL_DOWN,
-            payload: null,
+            payload: isFromMain,
         });
     };
 
