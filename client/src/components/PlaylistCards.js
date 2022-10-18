@@ -1,4 +1,5 @@
-import { useContext, useState } from "react";
+"use strict";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import SongCard from "./SongCard.js";
 import { GlobalStoreContext } from "../store";
@@ -24,6 +25,24 @@ function PlaylistCards() {
         store.dragSong(dragStart, dropInd);
     };
     const { id } = useParams();
+
+    // let keydowner = useCallback(
+    //     (e) => {
+    //         if (store.activeButtons[1] && e.ctrlKey) {
+    //             if (e.code == "KeyY") store.redo();
+    //             if (e.code == "KeyZ") store.undo();
+    //         }
+    //     },
+    //     [store]
+    // );
+    // useEffect(() => {
+    //     document.addEventListener("keydown", keydowner);
+
+    //     return () => {
+    //         document.addEventListener("keydown", keydowner);
+    //     };
+    // }, [keydowner]);
+
     if (store.currentList == null) {
         store.setCurrentList(id);
         // alert("maybe " + window.location.pathname.split("/")[2]);

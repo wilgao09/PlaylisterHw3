@@ -76,13 +76,22 @@ body {
     font-size: 36pt;
 }
 
+#add-song-button {
+    font-size: 39pt;
+    padding: 0px 14px;
+}
+
 .playlister-button,
 .playlister-button-disabled {
     font-size: 36pt;
-    border-width: 0px;
+    border-width: 2px;
+    border-radius: 6pt;
     color: black;
     cursor: pointer;
     opacity: 100%;
+    vertical-align: top;
+    height: 100%;
+    display: inline-block;
 }
 
 .playlister-button:hover {

@@ -4,9 +4,6 @@ export default function (props) {
     const ref = useRef(null);
 
     useEffect(() => {
-        // console.log("VVVV");
-        // console.log(ref);
-        // console.log("^^^^");
         setTimeout(() => {
             if (!ref.current) return;
             ref.current.classList.add("is-visible");

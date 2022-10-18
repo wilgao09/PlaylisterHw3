@@ -28,8 +28,6 @@ function EditToolbar() {
     if (store.isListNameEditActive) {
         editStatus = true;
     }
-    console.log("the button array si ");
-    console.log(store.activeButtons);
     return (
         <span id="edit-toolbar">
             <input

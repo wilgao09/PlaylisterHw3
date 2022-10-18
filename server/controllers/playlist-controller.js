@@ -15,9 +15,6 @@ const Playlist = require("../models/playlist-model");
  */
 createPlaylist = (req, res) => {
     const body = req.body;
-    console.log("GOT A PLAYLIST REQUEST");
-    console.log("createPlaylist body: " + body);
-
     if (!body) {
         return res.status(400).json({
             success: false,
@@ -26,7 +23,6 @@ createPlaylist = (req, res) => {
     }
 
     const playlist = new Playlist(body);
-    console.log("playlist: " + JSON.stringify(body));
     if (!playlist) {
         return res.status(400).json({ success: false, error: err });
     }
@@ -49,12 +45,14 @@ createPlaylist = (req, res) => {
         });
 };
 getPlaylistById = async (req, res) => {
-    await Playlist.findOne({ _id: req.params.id }, (err, list) => {
-        if (err) {
+    Playlist.findById(req.params.id, (err, list) => {
+        if (err || list === null) {
             return res.status(400).json({ success: false, error: err });
         }
 
-        return res.status(200).json({ success: true, playlist: list });
+        return res
+            .status(200)
+            .json({ success: true, playlist: list, broken: true });
     }).catch((err) => console.log(err));
 };
 getPlaylists = async (req, res) => {
@@ -96,15 +94,14 @@ getPlaylistPairs = async (req, res) => {
 };
 
 deletePlaylistById = (req, res) => {
-    Playlist.deleteOne({ _id: req.params.id }, (err) => {
+    Playlist.findByIdAndDelete(req.params.id, (err) => {
         if (err) res.status(400).json({ success: false, err: err });
         getPlaylistPairs(req, res);
     });
 };
 
 updatePlaylistNameById = (req, res) => {
-    console.log("UPDATE PLN BY ID");
-    Playlist.findOne({ _id: req.params.id }, (err, doc) => {
+    Playlist.findById(req.params.id, (err, doc) => {
         if (err) res.status(400).json({ success: false, err: err });
         doc.name = req.params.name;
         doc.save().then(() => {

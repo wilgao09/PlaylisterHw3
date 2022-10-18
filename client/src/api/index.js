@@ -11,8 +11,9 @@
 */
 
 import axios from "axios";
+let t = window.location.href.split(":");
 const api = axios.create({
-    baseURL: "http://localhost:4000/api",
+    baseURL: t[1] + ":4000/api",
 });
 
 // THESE ARE ALL THE REQUESTS WE'LL BE MAKING, ALL REQUESTS HAVE A
@@ -29,7 +30,6 @@ export const deletePlaylistById = (id) => api.delete(`/playlist/${id}`);
 export const createPlaylist = (dat) => api.post(`/playlist`, dat);
 
 export const updatePlaylistNameById = async (id, name) => {
-    console.log("???? send api req");
     return api.put(`/playlist/${id}/${name}`);
 };
 

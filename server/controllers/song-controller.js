@@ -14,6 +14,7 @@ function addSong(req, res) {
             });
         }
     });
+    let k = 1 + 1;
 }
 
 function editSong(req, res) {
@@ -65,8 +66,6 @@ function dragSong(req, res) {
             let t = plist.songs.splice(dstart, 1)[0];
 
             plist.songs.splice(dend, 0, t);
-
-            console.log(plist);
 
             plist.save().then(() => {
                 res.status(201).json({

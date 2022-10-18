@@ -181,8 +181,6 @@ export const useGlobalStore = () => {
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
     store.changeListName = async function (id, newName) {
         let res = await api.updatePlaylistNameById(id, newName);
-        console.log("RES FROM CHANGE LSIT NAME");
-        console.log(res);
         if (res.data.success) {
             storeReducer({
                 type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
@@ -196,12 +194,10 @@ export const useGlobalStore = () => {
     ) {
         async function x() {
             let res = await api.createPlaylist(dat);
-            console.log("created list res is");
-            console.log(res);
             if (res.data.success) {
                 storeReducer({
                     type: GlobalStoreActionType.CREATE_NEW_LIST,
-                    payload: dat,
+                    payload: res.data.playlist,
                 });
 
                 store.history.push("/playlist/" + res.data.playlist._id);
@@ -213,6 +209,7 @@ export const useGlobalStore = () => {
 
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
     store.closeCurrentList = function () {
+        tps.clearAllTransactions();
         storeReducer({
             type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
             payload: {},
@@ -221,17 +218,26 @@ export const useGlobalStore = () => {
 
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = function () {
+        tps.clearAllTransactions();
         async function asyncLoadIdNamePairs() {
-            const response = await api.getPlaylistPairs();
-            if (response.data.success) {
-                let pairsArray = response.data.idNamePairs;
-                storeReducer({
-                    type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
-                    payload: pairsArray,
+            api.getPlaylistPairs()
+                .then((response) => {
+                    if (response.data.success) {
+                        let pairsArray = response.data.idNamePairs;
+                        storeReducer({
+                            type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                            payload: pairsArray,
+                        });
+                    } else {
+                        console.log("API FAILED TO GET THE LIST PAIRS");
+                    }
+                })
+                .catch((err) => {
+                    storeReducer({
+                        type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                        payload: [],
+                    });
                 });
-            } else {
-                console.log("API FAILED TO GET THE LIST PAIRS");
-            }
         }
         asyncLoadIdNamePairs();
     };
@@ -242,7 +248,7 @@ export const useGlobalStore = () => {
 
             if (response.data.success) {
                 let playlist = response.data.playlist;
-
+                console.log(playlist);
                 if (response.data.success) {
                     storeReducer({
                         type: GlobalStoreActionType.SET_CURRENT_LIST,
@@ -274,15 +280,22 @@ export const useGlobalStore = () => {
 
     store.deleteList = function (id) {
         (async function () {
-            let res = await api.deletePlaylistById(id);
-            if (res.data.success) {
-                let ndata = res.data.idNamePairs;
-                console.log(ndata);
-                storeReducer({
-                    type: GlobalStoreActionType.DELETE_LIST,
-                    payload: ndata,
+            api.deletePlaylistById(id)
+                .then((res) => {
+                    if (res.data.success) {
+                        let ndata = res.data.idNamePairs;
+                        storeReducer({
+                            type: GlobalStoreActionType.DELETE_LIST,
+                            payload: ndata,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    storeReducer({
+                        type: GlobalStoreActionType.DELETE_LIST,
+                        payload: [],
+                    });
                 });
-            }
         })();
     };
 
@@ -290,6 +303,8 @@ export const useGlobalStore = () => {
         if (!store.currentList) return;
         (async function () {
             let res = await api.addSong(store.currentList._id, ind, dat);
+            console.log("res is");
+            console.log(res);
             if (res.data.success) {
                 storeReducer({
                     type: GlobalStoreActionType.SONG.ADD,
